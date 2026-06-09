@@ -66,6 +66,7 @@ That's it. No login prompt, no theme picker, no trust dialog — it boots **read
 - 🚪 **Starts ready** — onboarding, trust dialog and login all pre-handled
 - 🛡️ **Non-root & hardened** — overlays the *official* OpenClaw image (tini, healthcheck, full plugin set: browser, canvas, voice…)
 - ☁️ **VPS-ready** — gateway + Control UI, one `docker compose` away
+- 🎛️ **Swappable model** — `--build-arg ANTHROPIC_MODEL=…` (default **Opus 4.8 · 1M**)
 - 📌 **Pinnable** — `--build-arg OPENCLAW_VERSION=…` (default `latest`)
 
 ## ☁️ Deploy on a VPS (Coolify)

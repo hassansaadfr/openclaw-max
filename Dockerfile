@@ -19,12 +19,22 @@ RUN npm install -g @anthropic-ai/claude-code \
 # Running as the image's non-root `node` user means
 # `claude --dangerously-skip-permissions` is allowed natively (no root override).
 COPY claude.json /home/node/.claude.json
-COPY openclaw.json /usr/local/share/openclaw/openclaw.json
 COPY --chmod=0755 entrypoint.sh /usr/local/bin/claude-entrypoint.sh
 RUN chown node:node /home/node/.claude.json
 
-# Default model: Claude Opus 4.8, 1M context.
-ENV ANTHROPIC_MODEL="claude-opus-4-8[1m]"
+# Default model: Claude Opus 4.8 with a 1M context window. Override at build time:
+#   docker build --build-arg ANTHROPIC_MODEL='claude-sonnet-4-6' .
+ARG ANTHROPIC_MODEL=claude-opus-4-8[1m]
+ENV ANTHROPIC_MODEL=${ANTHROPIC_MODEL}
+
+# Bake the OpenClaw config from a template, deriving its model ref from
+# ANTHROPIC_MODEL (drop the [1m] context suffix, prefix anthropic/) so OpenClaw
+# and the claude CLI always select the same model.
+COPY openclaw.json.tmpl /usr/local/share/openclaw/openclaw.json.tmpl
+RUN base="$(printf '%s' "$ANTHROPIC_MODEL" | sed 's/\[.*//')" \
+    && sed "s#__OPENCLAW_MODEL__#anthropic/${base}#g" \
+         /usr/local/share/openclaw/openclaw.json.tmpl \
+         > /usr/local/share/openclaw/openclaw.json
 
 USER node
 
