@@ -12,6 +12,9 @@ services:
       # Set BOTH as secrets in Coolify → Environment Variables. Never commit real values.
       CLAUDE_CODE_OAUTH_TOKEN: ${CLAUDE_CODE_OAUTH_TOKEN}   # from `claude setup-token`
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}     # strong random token to reach the UI
+      # Your public domain(s), so the Control UI works behind Coolify/Traefik
+      # (otherwise the gateway answers "Browser origin not allowed").
+      OPENCLAW_ALLOWED_ORIGINS: ${OPENCLAW_ALLOWED_ORIGINS:-}   # e.g. https://openclaw.example.com
     # `expose` (not `ports`) → reachable only by Coolify's Traefik, never published to the host.
     expose:
       - "18789"

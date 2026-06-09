@@ -22,4 +22,22 @@ if [ ! -f "$HOME/.openclaw/openclaw.json" ]; then
   cp /usr/local/share/openclaw/openclaw.json "$HOME/.openclaw/openclaw.json"
 fi
 
+# 3) Allow the Control UI to be reached through a reverse proxy on a public domain
+#    (Coolify, Traefik, ...). Without this the gateway rejects the request with
+#    "Browser origin not allowed". Set OPENCLAW_ALLOWED_ORIGINS to a comma-separated
+#    list of origins (scheme + host, no trailing slash), e.g.
+#      OPENCLAW_ALLOWED_ORIGINS=https://openclaw.example.com
+if [ -n "${OPENCLAW_ALLOWED_ORIGINS:-}" ]; then
+  node -e '
+    const fs = require("fs");
+    const p = `${process.env.HOME}/.openclaw/openclaw.json`;
+    const cfg = JSON.parse(fs.readFileSync(p, "utf8"));
+    cfg.gateway = cfg.gateway || {};
+    cfg.gateway.controlUi = cfg.gateway.controlUi || {};
+    cfg.gateway.controlUi.allowedOrigins = process.env.OPENCLAW_ALLOWED_ORIGINS
+      .split(",").map((s) => s.trim()).filter(Boolean);
+    fs.writeFileSync(p, JSON.stringify(cfg, null, 2));
+  '
+fi
+
 exec "$@"

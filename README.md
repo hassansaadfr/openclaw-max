@@ -78,8 +78,11 @@ network, so the box only needs 80/443 open.
 
 1. **New Resource → Docker Compose**, pointed at this repo.
 2. Set a **domain** → Coolify issues the TLS cert automatically.
-3. Add two secrets: `CLAUDE_CODE_OAUTH_TOKEN` and `OPENCLAW_GATEWAY_TOKEN`
-   (`openssl rand -hex 32`).
+3. Add the environment variables:
+   - `CLAUDE_CODE_OAUTH_TOKEN` — from `claude setup-token`
+   - `OPENCLAW_GATEWAY_TOKEN` — a strong random token (`openssl rand -hex 32`)
+   - `OPENCLAW_ALLOWED_ORIGINS` — your domain, e.g. `https://openclaw.example.com`
+     (without it the gateway rejects the browser with *"Browser origin not allowed"*)
 4. **Deploy.** State persists in a volume; access is gated by the gateway token.
 
 ## 🔧 How it works (the clever bit)
