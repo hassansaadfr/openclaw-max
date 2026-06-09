@@ -1,0 +1,13 @@
+{
+  "hasCompletedOnboarding": true,
+  "theme": "dark",
+  "autoUpdates": false,
+  "projects": {
+    "/workspace": {
+      "hasTrustDialogAccepted": true,
+      "hasCompletedProjectOnboarding": true,
+      "projectOnboardingSeenCount": 1,
+      "allowedTools": []
+    }
+  }
+}

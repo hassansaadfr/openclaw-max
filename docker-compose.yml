@@ -1,0 +1,28 @@
+# OpenClaw gateway + Control UI on your Claude subscription (claude-cli backend),
+# ready to deploy behind Coolify. Coolify's Traefik provides the public domain and
+# HTTPS; this service only exposes the gateway port on the internal Docker network,
+# so the VPS firewall only ever needs 80/443 open.
+services:
+  openclaw:
+    build: .
+    restart: unless-stopped
+    # Run the WebSocket gateway + Control UI (not the local terminal TUI).
+    command: ["openclaw", "gateway", "--auth", "token", "--bind", "lan", "--port", "18789"]
+    environment:
+      # Set BOTH as secrets in Coolify → Environment Variables. Never commit real values.
+      CLAUDE_CODE_OAUTH_TOKEN: ${CLAUDE_CODE_OAUTH_TOKEN}   # from `claude setup-token`
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}     # strong random token to reach the UI
+    # `expose` (not `ports`) → reachable only by Coolify's Traefik, never published to the host.
+    expose:
+      - "18789"
+    volumes:
+      - openclaw-state:/home/node/.openclaw    # persists config, sessions, memory (node user)
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:18789/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+volumes:
+  openclaw-state:
